@@ -1,0 +1,52 @@
+version: "2"
+linters:
+  enable:
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - errorlint
+    - goconst
+    - godot
+    - importas
+    - nilerr
+    - promlinter
+    - revive
+    - sloglint
+    - testifylint
+    - unparam
+    - usestdlibvars
+  settings:
+    revive:
+      rules:
+        - name: exported
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - generated.*\.go$
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/qdrant)
+        - prefix(github.com/troubledpoor/migration/)
+  exclusions:
+    generated: lax
+    paths:
+      - generated.*\.go$
+      - third_party$
+      - builtin$
+      - examples$
